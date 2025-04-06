@@ -1,10 +1,24 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import React from "react"
 import { Link } from "react-router-dom"
+import axios from "axios"
 function Users(){
-    let [UserGrid,SetUserGrid]=useState([{
-        Name:"Chandu",Email:"karrichanndu309@gmail.com",age:20
-    }])
+    let [UserGrid,SetUserGrid]=useState([])
+
+    useEffect(()=>{
+        axios.get('http://localhost:3001')
+        .then(res=>SetUserGrid(res.data))
+         .catch(err=>console.log(err))
+    },[])
+
+    const handleDelete=(id)=>{
+        axios.delete('http://localhost:3001/deleteuser/'+id)
+        .then(res=>{
+            console.log(res)
+            window.location.reload()
+        })
+        .catch(err=>res.json(err))
+    }
 return(
    
     <>
@@ -24,11 +38,15 @@ return(
            {
             UserGrid.map(i=>(
                 <>
-                      <tr>
-                        <td>{i.Name}</td>
-                        <td>{i.Email}</td>
+                      <tr key={i._id}>
+                         <td>{i._id}</td>
+                        <td>{i.name}</td>
+                        <td>{i.email}</td>
                         <td>{i.age}</td>
-                        <td><button>Edit</button><button>Delete</button></td>
+                        <td>
+                        <Link to={`/update/${i._id}`} className="btn btn-success">Edit</Link>
+                        <button className="btn btn-danger" onClick={(e)=>{handleDelete(i._id)}}>Delete</button>
+                        </td>
                       </tr>
                 </>
 
